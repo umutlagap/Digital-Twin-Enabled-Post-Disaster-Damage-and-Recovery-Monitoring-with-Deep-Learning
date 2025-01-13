@@ -239,9 +239,6 @@ def shallowNet(input_shape=(224, 224, 3), num_classes=3):
     x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
     x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
 
-    x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same')(x)
-    x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
-
     # Apply Multi-Head Attention
     x = multi_head_attention_module(x, num_heads=4, key_dim=32)
 
@@ -453,14 +450,14 @@ def superimpose(img_bgr, cam, thresh, emphasize=False):
     return superimposed_img_rgb
 
 # --------------------------------------------------------------------------
-# 15. Identify the Last 3 Conv2D Layers in the Model
+# 15. Identify the Last 2 Conv2D Layers in the Model
 # --------------------------------------------------------------------------
 conv2D_layers = [layer.name for layer in model.layers if isinstance(layer, Conv2D)]
 print("All Conv2D layers:", conv2D_layers)
 
-# This number changes based on the model architecture. We'll just take the 3 Conv layers
-last_3_conv_layers = conv2D_layers[-3:]
-print("Last 3 Conv2D layers:", last_3_conv_layers)
+# This number changes based on the model architecture. We'll just take the 2 Conv layers
+last_2_conv_layers = conv2D_layers[-2:]
+print("Last 2 Conv2D layers:", last_2_conv_layers)
 
 # --------------------------------------------------------------------------
 # 16. Grad-CAM on a Sample Image
@@ -485,7 +482,7 @@ img_preprocessed = img_resized / 255.0
 img_batch = np.expand_dims(img_preprocessed, axis=0)
 
 # --------------------------------------------------------------------------
-# 17. Plot Original and the 3 Grad-CAMs
+# 17. Plot Original and the 2 Grad-CAMs
 # --------------------------------------------------------------------------
 plt.figure(figsize=(20, 6))
 
@@ -495,8 +492,8 @@ plt.imshow(img_resized)
 plt.axis('off')
 plt.title('Original Image')
 
-# Grad-CAM for each of the last 3 conv layers
-for i, layer_name in enumerate(last_3_conv_layers, start=2):
+# Grad-CAM for each of the last 2 conv layers
+for i, layer_name in enumerate(last_2_conv_layers, start=2):
     grad_cam_map = GradCam(model, img_batch, layer_name)
     superimposed_img = superimpose(img_resized, grad_cam_map, thresh=0.4, emphasize=True)
 
